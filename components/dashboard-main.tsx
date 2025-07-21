@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
 export function DashboardMain() {
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard Principal</h1>
-        <p className="text-muted-foreground">Resumen de métricas clave y rendimiento de tu tienda</p>
+        <p className="text-muted-foreground">
+          Resumen de métricas clave y rendimiento de tu tienda
+        </p>
       </div>
 
       {/* <MetricsCards />
@@ -22,5 +24,5 @@ export function DashboardMain() {
 
       <RecentOrders /> */}
     </div>
-  )
+  );
 }
