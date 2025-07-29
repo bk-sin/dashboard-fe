@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import axios from "axios";
 
 declare module "next-auth" {
   interface User {
@@ -18,29 +19,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+        try {
+          const res = await axios.post(
+            url,
+            {
               email: credentials?.email,
               password: credentials?.password,
-            }),
-          },
-        );
-        if (!res.ok) return null;
+            },
+            {
+              headers: { "Content-Type": "application/json" },
+            },
+          );
 
-        type LoginResponse = { access_token: string };
-        const data = (await res.json()) as LoginResponse;
-        if (data && data.access_token) {
-          return {
-            id: "jwt",
-            accessToken: data.access_token,
-            email: credentials.email as string,
-          } as { id: string; accessToken: string; email: string };
+          type LoginResponse = { access_token: string };
+          const data = res.data as LoginResponse;
+          if (data && data.access_token) {
+            return {
+              id: "jwt",
+              accessToken: data.access_token,
+              email: credentials.email as string,
+            } as { id: string; accessToken: string; email: string };
+          }
+          return null;
+        } catch {
+          return null;
         }
-        return null;
       },
     }),
   ],

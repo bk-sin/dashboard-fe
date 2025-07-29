@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import {
   useFormContext,
   ControllerRenderProps,
@@ -13,13 +14,21 @@ import {
 } from "../ui/form";
 import { Input, PasswordInput } from "../ui/input";
 import type { InputProps } from "../ui/input";
+import { Checkbox } from "../ui/checkbox";
 
-type FieldType = "text" | "email" | "password" | "number";
+type FieldType =
+  | "text"
+  | "email"
+  | "password"
+  | "number"
+  | "tel"
+  | "url"
+  | "checkbox";
 
 interface ControlledFormFieldProps<TFieldValues extends FieldValues>
-  extends InputProps {
+  extends Omit<InputProps, "type"> {
   name: Path<TFieldValues>;
-  label: string;
+  label: ReactNode;
   type?: FieldType;
 }
 
@@ -27,18 +36,42 @@ export const ControlledFormField = <TFieldValues extends FieldValues>({
   name,
   label,
   type = "text",
-  ...inputProps
+  ...props
 }: ControlledFormFieldProps<TFieldValues>) => {
   const { control } = useFormContext<TFieldValues>();
+
+  if (type === "checkbox") {
+    return (
+      <FormField
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={props.disabled}
+              />
+            </FormControl>
+            <div className="space-y-1 leading-none">
+              <FormLabel>{label}</FormLabel>
+              <FormMessage />
+            </div>
+          </FormItem>
+        )}
+      />
+    );
+  }
 
   const renderInput = (
     field: ControllerRenderProps<TFieldValues, Path<TFieldValues>>,
   ) => {
     switch (type) {
       case "password":
-        return <PasswordInput {...inputProps} {...field} />;
+        return <PasswordInput {...props} {...field} />;
       default:
-        return <Input type={type} {...inputProps} {...field} />;
+        return <Input type={type} {...props} {...field} />;
     }
   };
 
@@ -48,7 +81,7 @@ export const ControlledFormField = <TFieldValues extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel>{label as string}</FormLabel>
           <FormControl>{renderInput(field)}</FormControl>
           <FormMessage />
         </FormItem>
