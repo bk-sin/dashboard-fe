@@ -10,7 +10,7 @@ export const useRegisterMutation = () => {
   return useMutation({
     mutationFn: registerUser,
     onSuccess: () => {
-      router.push("/dashboard");
+      router.push("/");
     },
     onError: (error) => {
       console.error("Fallo el registro:", error);
