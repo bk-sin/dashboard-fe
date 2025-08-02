@@ -1,8 +1,11 @@
 "use client";
 
+import WelcomeMessage from "./welcome-message";
+
 export function DashboardMain() {
   return (
     <div className="space-y-6">
+      <WelcomeMessage />
       <div>
         <h1 className="text-3xl font-bold">Dashboard Principal</h1>
         <p className="text-muted-foreground">

@@ -1,17 +1,30 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import axios from "axios";
+import { ApiLoginResponse } from "./next-auth";
 
-declare module "next-auth" {
-  interface User {
-    accessToken?: string;
-  }
-  interface Session {
-    accessToken?: string;
-  }
-}
+const authCallbacks: NextAuthConfig["callbacks"] = {
+  jwt({ token, user }) {
+    if (user) {
+      return { ...token, ...user };
+    }
+    return token;
+  },
+  session({ session, token }) {
+    session.user = {
+      id: token.id,
+      firstName: token.firstName,
+      lastName: token.lastName,
+      email: token.email,
+      role: token.role,
+      emailVerified: token.emailVerified,
+    };
+    session.accessToken = token.accessToken;
+    return session;
+  },
+};
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const authConfig: NextAuthConfig = {
   providers: [
     Credentials({
       credentials: {
@@ -20,44 +33,44 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+
         try {
-          const res = await axios.post(
+          const res = await axios.post<ApiLoginResponse>(
             url,
             {
-              email: credentials?.email,
-              password: credentials?.password,
+              email: credentials.email,
+              password: credentials.password,
             },
             {
               headers: { "Content-Type": "application/json" },
             },
           );
 
-          type LoginResponse = { access_token: string };
-          const data = res.data as LoginResponse;
+          const data = res.data;
+
           if (data && data.access_token) {
             return {
-              id: "jwt",
+              id: String(data.id),
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.email,
+              role: data.role,
               accessToken: data.access_token,
-              email: credentials.email as string,
-            } as { id: string; accessToken: string; email: string };
+              emailVerified: data.emailVerified,
+            };
           }
           return null;
-        } catch {
-          return null;
+        } catch (error) {
+          console.error("[AUTH_ERROR]", error);
+          throw new Error("Error en el servidor de autenticación.");
         }
       },
     }),
   ],
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.accessToken = user.accessToken;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      session.accessToken = token.accessToken as string;
-      return session;
-    },
+  callbacks: authCallbacks,
+  pages: {
+    signIn: "/login",
   },
-});
+};
+
+export const { handlers, signIn, signOut, auth } = NextAuth(authConfig);
