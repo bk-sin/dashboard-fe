@@ -3,6 +3,12 @@ import Credentials from "next-auth/providers/credentials";
 import axios from "axios";
 import { ApiLoginResponse } from "./next-auth";
 
+declare module "next-auth" {
+  interface User {
+    errorType?: string;
+  }
+}
+
 const authCallbacks: NextAuthConfig["callbacks"] = {
   jwt({ token, user }) {
     if (user) {
@@ -33,7 +39,6 @@ const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
-
         try {
           const res = await axios.post<ApiLoginResponse>(
             url,
@@ -45,7 +50,6 @@ const authConfig: NextAuthConfig = {
               headers: { "Content-Type": "application/json" },
             },
           );
-
           const data = res.data;
 
           if (data && data.access_token) {
@@ -61,13 +65,38 @@ const authConfig: NextAuthConfig = {
           }
           return null;
         } catch (error) {
-          console.error("[AUTH_ERROR]", error);
-          throw new Error("Error en el servidor de autenticación.");
+          if (axios.isAxiosError(error)) {
+            if (error.response?.status === 403) {
+              return {
+                id: "403",
+                firstName: "",
+                lastName: "",
+                email: credentials.email as string,
+                role: "",
+                accessToken: "",
+                emailVerified: null,
+                errorType: "FORBIDDEN",
+              };
+            }
+          }
+          return null;
         }
       },
     }),
   ],
-  callbacks: authCallbacks,
+  callbacks: {
+    ...authCallbacks,
+    signIn({ user }) {
+      if (
+        user?.errorType === "FORBIDDEN" ||
+        user?.errorType === "UNAUTHORIZED"
+      ) {
+        return false;
+      }
+      return true;
+    },
+  },
+
   pages: {
     signIn: "/login",
   },

@@ -4,7 +4,6 @@ import "@testing-library/jest-dom";
 import { useSession } from "next-auth/react";
 import WelcomeMessage from "../welcome-message";
 
-// Mock next-auth/react
 jest.mock("next-auth/react");
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 

@@ -8,6 +8,9 @@ export const loginUser = async (credentials: LoginFormT) => {
     redirect: false,
   });
 
+  if (result && result.error === "AccessDenied") {
+    throw new Error("No tienes permisos para acceder al dashboard.");
+  }
   if (result && result.error) {
     throw new Error("Email o contraseña incorrectos.");
   }
