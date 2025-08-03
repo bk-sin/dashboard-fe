@@ -1,5 +1,3 @@
 import { Home } from "lucide-react";
 
-export const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
-]
+export const navigation = [{ name: "Dashboard", href: "/", icon: Home }];
