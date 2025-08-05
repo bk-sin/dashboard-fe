@@ -1,11 +1,9 @@
 import { useMemo } from "react";
 import { AlertTriangle, CheckCircle, TrendingUp } from "lucide-react";
-import { DashboardData } from "@/components/dashboard/types";
+import { DashboardStats } from "@/components/dashboard/types";
 
-export function useDashboardPresentation(data: DashboardData) {
+export function useDashboardPresentation(stats: DashboardStats) {
   return useMemo(() => {
-    const { stats } = data;
-
     return {
       activeUsersDisplay: `${stats.activeUsersPercentage}% del total`,
       newUsersDisplay: `+${stats.newUsersThisMonth} este mes`,
@@ -24,5 +22,5 @@ export function useDashboardPresentation(data: DashboardData) {
       metricCardClassName:
         stats.attentionRequiredCount > 15 ? "border-red-200 bg-red-50" : "",
     };
-  }, [data]);
+  }, [stats]);
 }

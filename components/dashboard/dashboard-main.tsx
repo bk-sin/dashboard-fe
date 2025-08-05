@@ -1,41 +1,46 @@
 "use client";
 
-import { useDashboardData } from "@/hooks/use-dashboard-data";
-import { useDashboardPresentation } from "@/hooks/use-dashboard-calculations";
+import {
+  useDashboardActivity,
+  useDashboardCharts,
+  useDashboardMetrics,
+} from "@/hooks/use-dashboard-data";
 import { DashboardMetricsGrid } from "./dashboard-metrics-grid";
+import { useDashboardPresentation } from "@/hooks/use-dashboard-calculations";
 import { DashboardChartsSection } from "./dashboard-charts-section";
 import { DashboardDetailsSection } from "./dashboard-details-section";
 import { SystemAlerts } from "../system-alerts";
 
 export function DashboardMain() {
-  const { data } = useDashboardData();
-  const { stats, roleStats, recentUsers, recentActivity } = data;
-  const presentation = useDashboardPresentation(data);
+  const { data: activityData } = useDashboardActivity();
+  const { data: chartsData } = useDashboardCharts();
+  const { data: metricsData } = useDashboardMetrics();
 
+  const presentation = useDashboardPresentation(metricsData.stats);
   return (
     <main className="flex-1 p-6 space-y-6">
       <DashboardMetricsGrid
-        stats={stats}
+        stats={metricsData.stats}
         presentation={presentation}
         variant="main"
       />
 
-      <DashboardChartsSection roleStats={roleStats} />
+      <DashboardChartsSection roleStats={chartsData.roleStats} />
 
       <DashboardDetailsSection
-        roleStats={roleStats}
-        recentUsers={recentUsers}
-        recentActivity={recentActivity}
+        roleStats={chartsData.roleStats}
+        recentUsers={activityData.recentUsers}
+        recentActivity={activityData.recentActivity}
       />
 
       <SystemAlerts
-        blockedUsers={stats.blockedUsers}
-        unverifiedUsers={stats.unverifiedUsers}
-        failedLogins={stats.failedLoginsToday}
+        blockedUsers={metricsData.stats.blockedUsers}
+        unverifiedUsers={metricsData.stats.unverifiedUsers}
+        failedLogins={metricsData.stats.failedLoginsToday}
       />
 
       <DashboardMetricsGrid
-        stats={stats}
+        stats={metricsData.stats}
         presentation={presentation}
         variant="secondary"
       />
