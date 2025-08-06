@@ -1,8 +1,15 @@
+import {
+  DashboardChartsSection,
+  DashboardDetailsSection,
+  DashboardMetricsGrid,
+} from "@/components/dashboard";
 import DashboardLayout from "@/components/dashboard/dashboard-layout";
-import { DashboardMain } from "../components/dashboard/dashboard-main";
-import { getDashboardActivity } from "@/data/dashboard-activity";
-import { getDashboardMetrics } from "@/data/dashboard-metrics";
-import { getDashboardCharts } from "@/data/dashboard-charts";
+import { SystemAlerts } from "@/components/system-alerts";
+import {
+  getDashboardActivity,
+  getDashboardCharts,
+  getDashboardMetrics,
+} from "@/data";
 
 export default async function Home() {
   const [activityData, metricsData, chartsData] = await Promise.all([
@@ -13,11 +20,16 @@ export default async function Home() {
 
   return (
     <DashboardLayout>
-      <DashboardMain
-        initialActivityData={activityData}
-        initialMetricsData={metricsData}
-        initialChartsData={chartsData}
-      />
+      <main className="flex-1 p-6 space-y-6">
+        <DashboardMetricsGrid initialData={metricsData} />
+        <DashboardChartsSection initialData={chartsData} />
+        <DashboardDetailsSection
+          initialData={activityData}
+          initialChartsData={chartsData}
+        />
+        <SystemAlerts initialData={metricsData} />
+        <DashboardMetricsGrid variant="secondary" initialData={metricsData} />
+      </main>
     </DashboardLayout>
   );
 }
