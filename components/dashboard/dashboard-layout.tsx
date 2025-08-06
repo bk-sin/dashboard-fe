@@ -1,5 +1,3 @@
-"\"use client";
-
 import type React from "react";
 import Header from "../header";
 import { Sidebar } from "../sidebar/sidebar";

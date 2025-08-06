@@ -7,7 +7,7 @@ interface DashboardActivityData {
 
 export const getDashboardActivity =
   async (): Promise<DashboardActivityData> => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const now = new Date();
     const getRandomDate = (minutesAgo: number) => {

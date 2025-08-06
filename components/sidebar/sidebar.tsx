@@ -1,3 +1,5 @@
+"use client";
+
 import { usePathname } from "next/navigation";
 import SidebarContent from "./sidebar-content";
 import { useSidebar } from "@/store/sidebar-store";

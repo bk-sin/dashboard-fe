@@ -1,7 +1,5 @@
 export const getDashboardMetrics = async () => {
-  // Simular delay de API
-  await new Promise((resolve) => setTimeout(resolve, 200));
-
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   return {
     stats: {
       totalUsers: 2450,

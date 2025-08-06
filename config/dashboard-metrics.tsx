@@ -26,7 +26,7 @@ interface MetricConfig {
   getValueClassName?: (presentation: DashboardPresentation) => string;
 }
 
-export const MAIN_METRICS_CONFIG: MetricConfig[] = [
+const MAIN_METRICS_CONFIG: MetricConfig[] = [
   {
     id: "total-users",
     title: "Total Usuarios",
@@ -67,7 +67,7 @@ export const MAIN_METRICS_CONFIG: MetricConfig[] = [
   },
 ];
 
-export const SECONDARY_METRICS_CONFIG: MetricConfig[] = [
+const SECONDARY_METRICS_CONFIG: MetricConfig[] = [
   {
     id: "endpoints",
     title: "Endpoints",
@@ -98,3 +98,14 @@ export const SECONDARY_METRICS_CONFIG: MetricConfig[] = [
     getDescription: (stats) => `de ${stats.totalRoles} totales`,
   },
 ];
+
+export const GRID_VARIANTS_CONFIG = {
+  main: {
+    config: MAIN_METRICS_CONFIG,
+    className: "grid gap-4 md:grid-cols-2 lg:grid-cols-4",
+  },
+  secondary: {
+    config: SECONDARY_METRICS_CONFIG,
+    className: "grid gap-4 md:grid-cols-4",
+  },
+};

@@ -11,25 +11,37 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Users, Shield, Activity } from "lucide-react";
 import Link from "next/link";
+import { useDashboardMetrics } from "@/store/dashboard-store";
+import { DashboardStats } from "./dashboard/types";
 
 interface SystemAlertsProps {
-  blockedUsers: number;
-  unverifiedUsers: number;
-  failedLogins: number;
+  initialData?: {
+    stats: DashboardStats;
+  };
 }
 
-export function SystemAlerts({
-  blockedUsers,
-  unverifiedUsers,
-  failedLogins,
-}: SystemAlertsProps) {
+export function SystemAlerts({ initialData }: SystemAlertsProps) {
+  const { data, isLoading } = useDashboardMetrics(initialData);
+  if (isLoading || !data) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Cargando Alertas...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          Por favor espera mientras se cargan los datos.
+        </CardContent>
+      </Card>
+    );
+  }
+
   const alerts = [];
 
-  if (blockedUsers > 0) {
+  if (data.stats.blockedUsers > 0) {
     alerts.push({
       id: "blocked-users",
       title: "Usuarios Bloqueados",
-      description: `${blockedUsers} usuarios están bloqueados y requieren revisión`,
+      description: `${data.stats.blockedUsers} usuarios están bloqueados y requieren revisión`,
       severity: "warning" as const,
       icon: Users,
       action: "Ver Usuarios Bloqueados",
@@ -37,11 +49,11 @@ export function SystemAlerts({
     });
   }
 
-  if (unverifiedUsers > 10) {
+  if (data.stats.unverifiedUsers > 10) {
     alerts.push({
       id: "unverified-users",
       title: "Usuarios Sin Verificar",
-      description: `${unverifiedUsers} usuarios no han verificado su email`,
+      description: `${data.stats.unverifiedUsers} usuarios no han verificado su email`,
       severity: "info" as const,
       icon: Shield,
       action: "Ver Usuarios Sin Verificar",
@@ -49,11 +61,11 @@ export function SystemAlerts({
     });
   }
 
-  if (failedLogins > 50) {
+  if (data.stats.failedLoginsToday > 50) {
     alerts.push({
       id: "failed-logins",
       title: "Intentos de Login Fallidos",
-      description: `${failedLogins} intentos fallidos hoy - posible actividad sospechosa`,
+      description: `${data.stats.failedLoginsToday} intentos fallidos hoy - posible actividad sospechosa`,
       severity: "error" as const,
       icon: Activity,
       action: "Ver Logs de Seguridad",

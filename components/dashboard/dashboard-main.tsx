@@ -1,48 +1,39 @@
-"use client";
-
-import {
-  useDashboardActivity,
-  useDashboardCharts,
-  useDashboardMetrics,
-} from "@/hooks/use-dashboard-data";
 import { DashboardMetricsGrid } from "./dashboard-metrics-grid";
-import { useDashboardPresentation } from "@/hooks/use-dashboard-calculations";
 import { DashboardChartsSection } from "./dashboard-charts-section";
 import { DashboardDetailsSection } from "./dashboard-details-section";
 import { SystemAlerts } from "../system-alerts";
+import { ActivityItem, RecentUser, DashboardStats, RoleStat } from "./types";
 
-export function DashboardMain() {
-  const { data: activityData } = useDashboardActivity();
-  const { data: chartsData } = useDashboardCharts();
-  const { data: metricsData } = useDashboardMetrics();
+interface DashboardMainProps {
+  initialActivityData?: {
+    recentUsers: RecentUser[];
+    recentActivity: ActivityItem[];
+  };
+  initialMetricsData?: {
+    stats: DashboardStats;
+  };
+  initialChartsData?: {
+    roleStats: RoleStat[];
+  };
+}
 
-  const presentation = useDashboardPresentation(metricsData.stats);
+export function DashboardMain({
+  initialActivityData,
+  initialMetricsData,
+  initialChartsData,
+}: DashboardMainProps) {
   return (
     <main className="flex-1 p-6 space-y-6">
-      <DashboardMetricsGrid
-        stats={metricsData.stats}
-        presentation={presentation}
-        variant="main"
-      />
-
-      <DashboardChartsSection roleStats={chartsData.roleStats} />
-
+      <DashboardMetricsGrid initialData={initialMetricsData} />
+      <DashboardChartsSection initialData={initialChartsData} />
       <DashboardDetailsSection
-        roleStats={chartsData.roleStats}
-        recentUsers={activityData.recentUsers}
-        recentActivity={activityData.recentActivity}
+        initialData={initialActivityData}
+        initialChartsData={initialChartsData}
       />
-
-      <SystemAlerts
-        blockedUsers={metricsData.stats.blockedUsers}
-        unverifiedUsers={metricsData.stats.unverifiedUsers}
-        failedLogins={metricsData.stats.failedLoginsToday}
-      />
-
+      <SystemAlerts initialData={initialMetricsData} />
       <DashboardMetricsGrid
-        stats={metricsData.stats}
-        presentation={presentation}
         variant="secondary"
+        initialData={initialMetricsData}
       />
     </main>
   );
